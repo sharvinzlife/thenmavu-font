@@ -5,6 +5,21 @@ Versions match the font's own name table (`Version 2.200` = 2.2.0 here).
 
 Legend: ✨ added · 🔧 changed · 🐛 fixed · 🗑️ removed
 
+## 2.3.0 — 2026-09-19 · conjuncts survive a language tag
+
+### 🐛 Fixed
+- **Conjuncts fell apart wherever text was tagged as Malayalam.** Baloo Chettan 2 ships a `MAL `
+  language system without `akhn`, the feature that forms `സ്സ ട്ട ക്ക ന്മ`; its default system has it.
+  Untagged text was fine, so nothing here noticed. Tagged text — libass (ffmpeg subtitles, mpv, VLC),
+  Pango on Linux, a web page with `lang="ml"` — rendered `സ്‌സ` with a visible `്`. Found while
+  rendering lyrics through ffmpeg. Every Malayalam language system now carries all of its script's
+  default features (4 feature references restored across GSUB and GPOS).
+
+### 🔧 Changed
+- **`verify()` shapes every proof line twice**: untagged, and tagged `ml`. Both must match the base
+  font's untagged shaping. The old check only ever exercised the default language system, which is
+  exactly how this slipped through.
+
 ## 2.2.0 — 2026-09-19 · even spacing
 
 Letters inside a word were unevenly spaced: some fused, some stood apart.

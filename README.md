@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 2.200" src="https://img.shields.io/badge/version-2.200-ffd21f?style=flat-square&labelColor=0b0906">
+  <img alt="version 2.300" src="https://img.shields.io/badge/version-2.300-ffd21f?style=flat-square&labelColor=0b0906">
   <img alt="script: Malayalam" src="https://img.shields.io/badge/script-%E0%B4%AE%E0%B4%B2%E0%B4%AF%E0%B4%BE%E0%B4%B3%E0%B4%82-ffd21f?style=flat-square&labelColor=0b0906">
   <img alt="1020 glyphs" src="https://img.shields.io/badge/glyphs-1020-ffd21f?style=flat-square&labelColor=0b0906">
   <img alt="macOS, Windows, Linux" src="https://img.shields.io/badge/installs%20on-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-efe6cf?style=flat-square&labelColor=0b0906">

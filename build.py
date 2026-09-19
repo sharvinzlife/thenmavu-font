@@ -31,7 +31,7 @@ from fontTools.ttLib.tables import otTables
 from fontTools.ttLib.tables.otBase import BaseTable, ValueRecord
 
 FAMILY = "Thenmavu"
-VERSION = "2.200"
+VERSION = "2.300"
 RELEASED = "2026-09-19"  # stamped into the font instead of the build time, so a rebuild is byte-identical
 BODY_BAND = (0.15, 0.45)  # em above the baseline where neighbouring letters face each other
 TRACED_SIDE_BEARING = 6  # font units each side of a traced glyph: lands their gaps in the base glyphs' 13-36 range
@@ -297,6 +297,31 @@ def scale_positioning(font, kx, ky):
     walk(font["GPOS"].table)
 
 
+def complete_malayalam_language_systems(font):
+    """Give every Malayalam language system the features its script's default system has.
+
+    Baloo Chettan 2 ships a `MAL ` language system without `akhn`, the feature that forms
+    conjuncts such as SSA+SSA, TTA+TTA, KA+KA and NA+MA. Text tagged as Malayalam - by libass (ffmpeg
+    subtitles, mpv, VLC), by Pango on Linux, by a web page with lang="ml" - is shaped under `MAL `
+    and the conjuncts fall apart; untagged text uses the default system and is fine, which is why
+    it is easy to miss. Returns how many feature references were added.
+    """
+    added = 0
+    for tag in ("GSUB", "GPOS"):
+        if tag not in font:
+            continue
+        for script in font[tag].table.ScriptList.ScriptRecord:
+            default = script.Script.DefaultLangSys
+            if script.ScriptTag not in ("mlm2", "mlym") or default is None:
+                continue
+            for record in script.Script.LangSysRecord:
+                system = record.LangSys
+                merged = sorted(set(system.FeatureIndex) | set(default.FeatureIndex))
+                added += len(merged) - len(system.FeatureIndex)
+                system.FeatureIndex, system.FeatureCount = merged, len(merged)
+    return added
+
+
 def anchored_lookups(font):
     """GPOS lookups that attach glyphs at anchor points (cursive, mark-to-base/ligature/mark)."""
     if "GPOS" not in font:
@@ -465,6 +490,7 @@ def build(base_path, out_path, grow_em, soften_em, pin_em, spacing, lean, traced
     shapes = {name: glyph_shape(glyph_set, name).transform(x_scale, 0, 0, y_scale, 0, 0)
               for name in font.getGlyphOrder()}
     scale_positioning(font, x_scale, y_scale)
+    language_fixes = complete_malayalam_language_systems(font)
 
     glyf, hmtx = font["glyf"], font["hmtx"]
     for name in font.getGlyphOrder():
@@ -517,15 +543,18 @@ def build(base_path, out_path, grow_em, soften_em, pin_em, spacing, lean, traced
     print(f"built {out_path}: grow={grow:.0f} soften={soften:.0f} pinhole={pin:.0f} units @ {upm} upm, lean {lean} deg; "
           f"{len(squeezed_glyphs)} glyphs had a counter held open as a pinhole; "
           f"{nudged} boolean ops needed a nudged radius; {len(traced)} traced glyphs, {len(ligatures)} new ligature, "
-          f"{len(mid_forms)} flourishes limited to word starts")
+          f"{len(mid_forms)} flourishes limited to word starts; "
+          f"{language_fixes} features restored to Malayalam language systems")
     return shapes, pin, set(traced), ligatures, mid_forms, shifts
 
 
-def shape_text(font_path, text):
+def shape_text(font_path, text, language=None):
     font = hb.Font(hb.Face(hb.Blob.from_file_path(font_path)))
     buffer = hb.Buffer()
     buffer.add_str(text)
     buffer.guess_segment_properties()
+    if language:
+        buffer.language = language
     hb.shape(font, buffer)
     return [font.glyph_to_string(info.codepoint) for info in buffer.glyph_infos]
 
@@ -566,11 +595,15 @@ def verify(base_path, out_path, shapes, pin, lean, traced_names, ligatures, mid_
     seen_big, seen_plain = set(), set()
     for line in "\n".join((TITLE, STRESS, MIXED)).splitlines():
         expected = plain_inside_words(collapse(shape_text(base_path, line), ligatures), mid_forms, letters)
-        got = shape_text(out_path, line)
-        seen_big |= set(got) & set(mid_forms)
-        seen_plain |= set(got) & set(mid_forms.values())
-        if expected != got:
-            failures.append(f"shaping changed for {line!r}:\n      base {expected}\n      now  {got}")
+        # Shape untagged AND tagged as Malayalam: renderers that tag the text (libass, Pango, a web
+        # page with lang="ml") select a different language system, and both must give the same result.
+        for language in (None, "ml"):
+            got = shape_text(out_path, line, language)
+            seen_big |= set(got) & set(mid_forms)
+            seen_plain |= set(got) & set(mid_forms.values())
+            if expected != got:
+                failures.append(f"shaping changed for {line!r} (language={language}):\n"
+                                f"      base {expected}\n      now  {got}")
 
     out_set = out.getGlyphSet()
     unshear = -math.tan(math.radians(lean))

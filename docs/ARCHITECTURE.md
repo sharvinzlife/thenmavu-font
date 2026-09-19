@@ -84,7 +84,8 @@ The build re-opens the font it just saved. It exits non-zero if:
 - 🔴 any base counter closed up (each original counter must still contain open space);
 - 🔴 the character map changed, or the glyph order is not "the base's, plus the new glyphs";
 - 🔴 HarfBuzz shapes any proof line into a glyph sequence other than *the base font's sequence with
-  the two new rules applied*;
+  the two new rules applied* — checked twice, untagged and tagged as Malayalam (`ml`), because
+  renderers that tag the text select a different language system;
 - 🔴 the proof text never shows each flourish both opening a word and inside one — otherwise the
   check above would prove nothing about the `calt` rule.
 

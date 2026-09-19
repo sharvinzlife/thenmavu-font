@@ -39,6 +39,13 @@ The app is not doing complex-script shaping. Some older video titlers and game e
 one by one without a shaping engine; no font can fix that. Set the text in an app that shapes
 properly and import it as an image or outlines.
 
+## 🧩 Conjuncts show a stray `്` (`സ്‌സ` instead of `സ്സ`)
+
+Fixed in **2.3.0** — install the current file. Older builds inherited a Baloo Chettan 2 gap: text
+*tagged* as Malayalam (ffmpeg subtitles, mpv, VLC, GTK apps, web pages with `lang="ml"`) lost its
+conjuncts, while untagged text looked fine. With an older build in an `.ass` file, adding
+`Language: en` under `[Script Info]` works around it.
+
 ## ↕️ Lines of text collide
 
 The word-opening `െ` is drawn oversized and drops about a quarter of an em below the baseline, as
