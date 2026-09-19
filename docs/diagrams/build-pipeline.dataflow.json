@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Thenmavu Font Build Pipeline",
+    "output": "docs/diagrams/build-pipeline.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      640
+    ],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "emphasis": {
+          "label": "glyph data"
+        },
+        "security": {
+          "label": "verify gate"
+        },
+        "dashed": {
+          "label": "reads the font"
+        },
+        "database": {
+          "label": "checked-in asset"
+        },
+        "default": {
+          "label": "preparation"
+        }
+      }
+    }
+  },
+  "stages": [
+    {
+      "label": "Sources"
+    },
+    {
+      "label": "Extract"
+    },
+    {
+      "label": "Assets"
+    },
+    {
+      "label": "Build"
+    },
+    {
+      "label": "Ship"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "poster",
+      "type": "external",
+      "label": "Poster JPEG",
+      "sublabel": "hand-lettered title",
+      "stage": 0,
+      "row": 0,
+      "tag": "reference"
+    },
+    {
+      "id": "baloo",
+      "type": "external",
+      "label": "Baloo Chettan 2",
+      "sublabel": "variable font",
+      "stage": 0,
+      "row": 2,
+      "tag": "OFL 1.1"
+    },
+    {
+      "id": "trace",
+      "type": "backend",
+      "label": "trace.py",
+      "sublabel": "blobs to potrace",
+      "stage": 1,
+      "row": 0,
+      "tag": "Pillow"
+    },
+    {
+      "id": "instancer",
+      "type": "backend",
+      "label": "varLib.instancer",
+      "sublabel": "pin wght=800",
+      "stage": 1,
+      "row": 2,
+      "tag": "fontTools"
+    },
+    {
+      "id": "glyphs",
+      "type": "database",
+      "label": "glyphs.json",
+      "sublabel": "12 poster glyphs",
+      "stage": 2,
+      "row": 0,
+      "tag": "checked in"
+    },
+    {
+      "id": "static",
+      "type": "database",
+      "label": "ExtraBold TTF",
+      "sublabel": "1017 base glyphs",
+      "stage": 2,
+      "row": 2,
+      "tag": "static"
+    },
+    {
+      "id": "build",
+      "type": "backend",
+      "label": "build.py",
+      "sublabel": "inflate, space, lean",
+      "stage": 3,
+      "row": 1,
+      "tag": "skia-pathops"
+    },
+    {
+      "id": "verify",
+      "type": "security",
+      "label": "verify()",
+      "sublabel": "counters + shaping",
+      "stage": 3,
+      "row": 3,
+      "tag": "uharfbuzz"
+    },
+    {
+      "id": "font",
+      "type": "frontend",
+      "label": "Thenmavu Regular",
+      "sublabel": "one TTF, three OSes",
+      "stage": 4,
+      "row": 3,
+      "tag": "dist"
+    },
+    {
+      "id": "proofs",
+      "type": "frontend",
+      "label": "Proof sheets",
+      "sublabel": "title, mixed, stress",
+      "stage": 4,
+      "row": 1,
+      "tag": "hb-view"
+    }
+  ],
+  "flows": [
+    {
+      "id": "poster-blobs",
+      "from": "poster",
+      "to": "trace",
+      "label": "letter blobs",
+      "variant": "default"
+    },
+    {
+      "id": "trace-outlines",
+      "from": "trace",
+      "to": "glyphs",
+      "label": "smoothed outlines",
+      "variant": "default"
+    },
+    {
+      "id": "baloo-axis",
+      "from": "baloo",
+      "to": "instancer",
+      "label": "weight axis",
+      "variant": "default"
+    },
+    {
+      "id": "instancer-static",
+      "from": "instancer",
+      "to": "static",
+      "label": "heaviest instance",
+      "variant": "default"
+    },
+    {
+      "id": "glyphs-build",
+      "from": "glyphs",
+      "to": "build",
+      "label": "traced glyphs",
+      "variant": "emphasis"
+    },
+    {
+      "id": "static-build",
+      "from": "static",
+      "to": "build",
+      "label": "base glyphs + rules",
+      "variant": "emphasis"
+    },
+    {
+      "id": "build-verify",
+      "from": "build",
+      "to": "verify",
+      "label": "saved TTF, re-opened",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "verify-font",
+      "from": "verify",
+      "to": "font",
+      "label": "exit 0 if clean",
+      "variant": "security"
+    },
+    {
+      "id": "font-proofs",
+      "from": "font",
+      "to": "proofs",
+      "label": "HarfBuzz renders",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Two sources, one face",
+      "items": [
+        "12 glyphs are the poster’s own lettering, vector-traced",
+        "About 1000 more are Baloo Chettan 2, reshaped to match"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "What build.py changes",
+      "items": [
+        "Squeezes, fattens, respaces and leans every base glyph",
+        "Adds one psts ligature and one calt rule, nothing else"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "What verify() refuses",
+      "items": [
+        "A counter that closed up under the growth",
+        "Any proof line HarfBuzz shapes unlike the base font"
+      ]
+    }
+  ]
+}
