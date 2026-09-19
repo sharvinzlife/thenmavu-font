@@ -12,16 +12,19 @@ through HarfBuzz with both fonts. Size parameters are fractions of the em.
 """
 
 import argparse
+import calendar
 import json
 import math
 import shutil
 import sys
+import time
 from pathlib import Path
 
 import pathops
 import uharfbuzz as hb
 from fontTools.otlLib.builder import buildCoverage, buildLigatureSubstSubtable, buildSingleSubstSubtable
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.misc.timeTools import epoch_diff
 from fontTools.svgLib.path import parse_path
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import otTables
@@ -29,6 +32,7 @@ from fontTools.ttLib.tables.otBase import BaseTable, ValueRecord
 
 FAMILY = "Thenmavu"
 VERSION = "2.200"
+RELEASED = "2026-09-19"  # stamped into the font instead of the build time, so a rebuild is byte-identical
 BODY_BAND = (0.15, 0.45)  # em above the baseline where neighbouring letters face each other
 TRACED_SIDE_BEARING = 6  # font units each side of a traced glyph: lands their gaps in the base glyphs' 13-36 range
 
@@ -255,6 +259,7 @@ def rename(font, base_family, lean):
     os2.fsSelection = (os2.fsSelection & ~0b100001) | 0b1000000  # clear ITALIC+BOLD, set REGULAR
     head.macStyle = 0
     head.fontRevision = float(VERSION)
+    head.modified = calendar.timegm(time.strptime(RELEASED, "%Y-%m-%d")) - epoch_diff
     # The family has one style, so it stays "Regular"; the angle only slants the text cursor to match.
     font["post"].italicAngle = -lean
     font["hhea"].caretSlopeRise, font["hhea"].caretSlopeRun = 1000, round(1000 * math.tan(math.radians(lean)))
@@ -443,7 +448,7 @@ def swap_in_traced(font, traced, shear):
 
 
 def build(base_path, out_path, grow_em, soften_em, pin_em, spacing, lean, traced_path, x_scale, y_scale, optical):
-    font = TTFont(base_path)
+    font = TTFont(base_path, recalcTimestamp=False)  # rename() sets head.modified from RELEASED
     if "glyf" not in font or "fvar" in font:
         sys.exit(f"{base_path}: need a static TrueType (glyf) base; instantiate variable fonts first")
     if lean and anchored_lookups(font):

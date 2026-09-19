@@ -11,8 +11,8 @@ A short loop. The build checks its own output, so a green build means more than 
    ```
    and **look** at `proofs/*.png`. `verify()` catches closed counters and broken shaping; it cannot
    catch ugly.
-4. 📝 Add an entry to [`CHANGELOG.md`](CHANGELOG.md). If the font changed, bump `VERSION` in `build.py`
-   and the version badge in the README to match.
+4. 📝 Add an entry to [`CHANGELOG.md`](CHANGELOG.md). If the font changed, bump `VERSION` and `RELEASED` in
+   `build.py`, and the version badge in the README to match.
 5. 🧭 Changed the pipeline's shape? Edit `docs/diagrams/build-pipeline.dataflow.json` and re-deliver
    it with Archify at `--quality showcase`.
 

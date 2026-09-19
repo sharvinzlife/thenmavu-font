@@ -24,6 +24,8 @@ Letters inside a word were unevenly spaced: some fused, some stood apart.
   below the line (`ു ൂ ൃ`) reserved room nothing used. Latin, digits and punctuation keep box
   spacing: a `T`'s arm sits above the band and collided with `h` at −67 units.
 - Traced glyphs' side bearing 16 → 6 units, landing their gaps in the base glyphs' range.
+- **Builds are reproducible.** The font's modified-date comes from `RELEASED` in `build.py`, not the
+  clock, so rebuilding an unchanged tree gives a byte-identical `.ttf`.
 - Measured over the whole proof text, the middle 80% of letter gaps went from 11–56 to 7–40 units and
   the widest from 88 to 50. A half-blend (`--optical 0.5`) was tried and gained nothing.
 
