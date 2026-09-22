@@ -5,6 +5,18 @@ Versions match the font's own name table (`Version 2.200` = 2.2.0 here).
 
 Legend: ✨ added · 🔧 changed · 🐛 fixed · 🗑️ removed
 
+## Repository — 2026-09-22 · public release
+
+The font is unchanged (still 2.300). The repository goes public.
+
+### 🔧 Changed
+- **Licensing spelled out for a public audience.** The build scripts are under the MIT License
+  (`LICENSE-CODE.txt`). The traced letters are stated to be part of the OFL font software, with the
+  legal basis (letterforms are not copyright subject matter in the US or India) and the non-commercial
+  wish kept as a request. The "do not redistribute" line is gone: it contradicted publishing.
+- **`proofs/README.md`** explains, file by file, why the title-card crop is reproduced and on what basis.
+- The README's private-repository warning is replaced by the licence summary.
+
 ## 2.3.0 — 2026-09-19 · conjuncts survive a language tag
 
 ### 🐛 Fixed

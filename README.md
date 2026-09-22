@@ -126,7 +126,7 @@ thenmavu-font/
 ├── dist/            📦 the font to install, and its licence
 ├── base/            🅱️ Baloo Chettan 2: the variable font, the pinned ExtraBold, its OFL
 ├── traced/          ✍️ glyphs.json — the poster's letterforms as outlines
-├── proofs/          🖼️ reference poster + rendered proof sheets
+├── proofs/          🖼️ title-card crop + rendered proof sheets (its README explains the crop)
 ├── trace.py         poster → outlines
 ├── build.py         base + outlines → font, then verify()
 ├── proof.py         font → proof sheets
@@ -148,14 +148,16 @@ thenmavu-font/
 
 ## ⚖️ Licence and use
 
-The **font software** is under the [SIL Open Font License 1.1](dist/OFL.txt). Keep that file with the
-font if you pass it on. Baloo Chettan 2 is © The Baloo 2 Project Authors; the OFL asks modified
-versions to carry a different name, hence "Thenmavu". The build scripts have no licence chosen yet;
-[LICENSE.md](LICENSE.md) spells out all three cases.
+- 🔤 **The font software** is under the [SIL Open Font License 1.1](dist/OFL.txt). Keep that file with the
+  font if you pass it on. Baloo Chettan 2 is © The Baloo 2 Project Authors; the OFL asks modified
+  versions to carry a different name, hence "Thenmavu".
+- ✍️ **The twelve traced letters** are part of that font software. They were traced from the film's title
+  lettering, and letterforms are not copyright subject matter in the United States or in India, so they
+  ship under the OFL like everything else. A request, not a term: keep them to personal, fan and
+  non-commercial titling. `build.py --traced ''` builds a version containing only the OFL-derived letters.
+- 🖼️ **`proofs/reference-poster.jpeg`** is the film's title card, reproduced only to show what was traced;
+  [proofs/README.md](proofs/README.md) says why that is fair use and fair dealing.
+- 🐍 **The build scripts** are under the [MIT License](LICENSE-CODE.txt).
 
-> [!WARNING]
-> **Keep this repository private unless you deal with two things first.** The twelve traced glyphs
-> reproduce a film's title artwork, and `proofs/reference-poster.jpeg` is a still from its poster.
-> Both are fine for personal projects and fan work. Titling something commercial with them could
-> read as trading on the film's identity. `build.py --traced ''` builds a version containing only
-> the OFL-derived letters.
+[LICENSE.md](LICENSE.md) spells out all four cases. This is a tribute: the film, its title and its artwork
+belong to their rights holders, and this project is not affiliated with or endorsed by them.
